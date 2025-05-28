@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menú El Shaday</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f3f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+
+    .container {
+      position: relative;
+      width: 90vw;
+      max-width: 400px;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+    }
+
+    .book {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s ease;
+    }
+
+    .page {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      backface-visibility: hidden;
+    }
+
+    .page img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .front {
+      z-index: 2;
+    }
+
+    .back {
+      transform: rotateY(180deg);
+    }
+
+    .flip .book {
+      transform: rotateY(180deg);
+    }
+
+    .nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.nav-button:hover {
+  background: rgba(0, 0, 0, 0.85);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.prev {
+  left: -70px;  /* Más sobresaliente hacia la izquierda */
+}
+
+.next {
+  right: -70px; /* Más sobresaliente hacia la derecha */
+}
+
+
+    @media (max-width: 600px) {
+      .nav-button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container flip-toggle" id="flipToggle">
+  <button class="nav-button prev" onclick="goBack()">←</button>
+  <div class="book" id="book">
+    <div class="page front">
+      <img src="https://i.ibb.co/BV8DjXXV/Whats-App-Image-2025-05-28-at-2-37-51-PM-1.jpg" alt="Menú Página 1">
+    </div>
+    <div class="page back">
+      <img src="https://i.ibb.co/0pQHQrpt/Whats-App-Image-2025-05-28-at-2-37-51-PM.jpg" alt="Menú Página 2">
+    </div>
+  </div>
+  <button class="nav-button next" onclick="goNext()">→</button>
+</div>
+
+<script>
+  const flipToggle = document.getElementById('flipToggle');
+  const book = document.getElementById('book');
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  function goNext() {
+    flipToggle.classList.add('flip');
+  }
+
+  function goBack() {
+    flipToggle.classList.remove('flip');
+  }
+
+  flipToggle.addEventListener('click', () => {
+    flipToggle.classList.toggle('flip');
+  });
+
+  flipToggle.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+
+  flipToggle.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    if (touchEndX < touchStartX - 50) goNext();
+    if (touchEndX > touchStartX + 50) goBack();
+  });
+</script>
+
+</body>
+</html>
