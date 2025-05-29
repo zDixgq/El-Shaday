@@ -2,147 +2,137 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Menú El Shaday</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       background: #f3f3f3;
+      font-family: sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      font-family: sans-serif;
-    }
-
-    .container {
-      position: relative;
-      width: 90vw;
-      max-width: 400px;
-      aspect-ratio: 3/4;
       overflow: hidden;
     }
 
-    .book {
-      width: 100%;
-      height: 100%;
+    .viewer {
+      width: 90vw;
+      max-width: 400px;
+      aspect-ratio: 3 / 4;
       position: relative;
-      transform-style: preserve-3d;
-      transition: transform 1s ease;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+      background: white;
+      /* Quitar overflow hidden para que los botones sobresalgan */
+      /* overflow: hidden; */
     }
 
-    .page {
-      position: absolute;
+    .image-container {
+      position: relative;
       width: 100%;
       height: 100%;
-      top: 0;
-      left: 0;
-      backface-visibility: hidden;
     }
 
-    .page img {
+    .image-container img {
+      position: absolute;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      user-select: none;
+      pointer-events: none;
+      border-radius: 16px;
     }
 
-    .front {
-      z-index: 2;
-    }
-
-    .back {
-      transform: rotateY(180deg);
-    }
-
-    .flip .book {
-      transform: rotateY(180deg);
+    .image-container img.active {
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
     }
 
     .nav-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: none;
-  padding: 12px 18px;
-  font-size: 28px;
-  cursor: pointer;
-  z-index: 5;
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-}
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      font-size: 28px;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+      user-select: none;
+      transition: background 0.3s ease;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
 
-.nav-button:hover {
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-  transform: translateY(-50%) scale(1.1);
-}
+    .nav-button:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
 
-.prev {
-  left: -70px;  /* Más sobresaliente hacia la izquierda */
-}
+    /* Botones sobresaliendo */
+    .prev {
+      left: -60px;
+    }
 
-.next {
-  right: -70px; /* Más sobresaliente hacia la derecha */
-}
-
+    .next {
+      right: -60px;
+    }
 
     @media (max-width: 600px) {
       .nav-button {
-        display: none;
+        font-size: 24px;
+        padding: 8px;
+        box-shadow: none;
+      }
+
+      /* Para móvil, botones más cerca y visibles */
+      .prev {
+        left: 10px;
+      }
+
+      .next {
+        right: 10px;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="container flip-toggle" id="flipToggle">
-  <button class="nav-button prev" onclick="goBack()">←</button>
-  <div class="book" id="book">
-    <div class="page front">
-      <img src="https://i.ibb.co/BV8DjXXV/Whats-App-Image-2025-05-28-at-2-37-51-PM-1.jpg" alt="Menú Página 1">
-    </div>
-    <div class="page back">
-      <img src="https://i.ibb.co/0pQHQrpt/Whats-App-Image-2025-05-28-at-2-37-51-PM.jpg" alt="Menú Página 2">
-    </div>
+<div class="viewer">
+  <button class="nav-button prev" onclick="showPrev()">←</button>
+
+  <div class="image-container">
+    <img src="https://i.ibb.co/BV8DjXXV/Whats-App-Image-2025-05-28-at-2-37-51-PM-1.jpg" alt="Menú Página 1" class="active" draggable="false" />
+    <img src="https://i.ibb.co/0pQHQrpt/Whats-App-Image-2025-05-28-at-2-37-51-PM.jpg" alt="Menú Página 2" draggable="false" />
   </div>
-  <button class="nav-button next" onclick="goNext()">→</button>
+
+  <button class="nav-button next" onclick="showNext()">→</button>
 </div>
 
 <script>
-  const flipToggle = document.getElementById('flipToggle');
-  const book = document.getElementById('book');
-  let touchStartX = 0;
-  let touchEndX = 0;
+  const imgs = document.querySelectorAll('.image-container img');
+  let current = 0;
 
-  function goNext() {
-    flipToggle.classList.add('flip');
+  function showImage(index) {
+    imgs[current].classList.remove('active');
+    current = index;
+    imgs[current].classList.add('active');
   }
 
-  function goBack() {
-    flipToggle.classList.remove('flip');
+  function showNext() {
+    let nextIndex = (current + 1) % imgs.length;
+    showImage(nextIndex);
   }
 
-  flipToggle.addEventListener('click', () => {
-    flipToggle.classList.toggle('flip');
-  });
-
-  flipToggle.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  });
-
-  flipToggle.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    if (touchEndX < touchStartX - 50) goNext();
-    if (touchEndX > touchStartX + 50) goBack();
-  });
+  function showPrev() {
+    let prevIndex = (current - 1 + imgs.length) % imgs.length;
+    showImage(prevIndex);
+  }
 </script>
 
 </body>
